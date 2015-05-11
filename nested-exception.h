@@ -55,12 +55,18 @@ struct NestedExceptionParameter
 		name( name_in ),
 		value( value_in )
 	{}
+	friend std::ostream & operator << ( std::ostream & os, const NestedExceptionParameter & r_params )
+	{
+		os << r_params.name << ": " << r_params.value;
+		return os;
+	}
 };
 
 class NestedExceptionParams
 {
 private:
-	std::vector< NestedExceptionParameter > params;
+	typedef std::vector< NestedExceptionParameter > params_t;
+	params_t params;
 
 public:
 	NestedExceptionParams() {}
@@ -98,6 +104,21 @@ public:
 	size_t size() const { return params.size(); }
 	const NestedExceptionParameter & operator []( size_t i ) const { return params[i]; }
 	NestedExceptionParameter & operator []( size_t i ) { return params[i]; }
+
+	friend std::ostream & operator << ( std::ostream & os, const NestedExceptionParams & r_params )
+	{
+		bool is_first = true;
+		for( params_t::const_iterator i( r_params.params.begin() ),
+					i_end( r_params.params.end() );
+				i != i_end;
+				++i )
+		{
+			if( ! is_first )
+				os << ", ";
+			os << *i;
+		}
+		return os;
+	}
 };
 
 struct NestedExceptionNode
@@ -116,14 +137,12 @@ struct NestedExceptionNode
 		description( description_in )
 	{
 	}
+
 	friend std::ostream & operator << ( std::ostream & os, const NestedExceptionNode & r_node )
 	{
 		os << r_node.error_uri;
 		if( ! r_node.error_params.empty() )
-		{
-			os << " (";
-			os << ")";
-		}
+			os << " (" << r_node.error_params << ")";
 		os << ": " << r_node.description;
 		return os;
 	}
@@ -152,6 +171,8 @@ public:
 		nodes.swap( r_prev_nested_exception.nodes );
 		nodes.push_front( NestedExceptionNode( error_uri_in, error_params_in, description_in ) );
 	}
+    virtual ~NestedException() {}
+
     virtual const char * what() const
     {
 		if( ! nodes.empty() )
@@ -163,30 +184,32 @@ public:
     void inspect( TinspectorFunctor & inspector ) const
     {
 		for( nodes_t::const_iterator i( nodes.begin() ),
-					i_end( nodes.ends() );
+					i_end( nodes.end() );
 				i != i_end;
 				++i )
 			inspector( *i );
     }
     bool empty() const { return nodes.empty(); }
-    
-    virtual ~NestedException() {}
-};
 
-class NestedExceptionPrinter
-{
-private:
-	size_t indent;
-	std::ostream & os;
+	class NestedExceptionPrinter
+	{
+	private:
+		size_t indent;
+		std::ostream & os;
 
-public:
-	static void print( std::ostream & os_in, const NestedException & nested_exception_in )
+	public:
+		NestedExceptionPrinter( std::ostream & os_in ) : indent( 0 ), os( os_in )
+		{}
+		void operator()( const NestedExceptionNode & r_node )
+		{
+			os << std::string( 2 * indent, ' ' ) << r_node;
+		}
+	};
+
+	friend std::ostream & operator << ( std::ostream & os, const NestedException & r_exception )
 	{
-	}
-	
-	void operator()( const NestedExceptionNode & r_node )
-	{
-		os << std::string( 2 * indent, ' ' ) << r_node;
+		NestedExceptionPrinter nested_exception_pointer( os );
+		r_exception.inspect( nested_exception_pointer );
 	}
 };
 
