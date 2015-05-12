@@ -219,6 +219,12 @@ public:
             return nodes.front().description;
         return "<Undescribed NestedException>";
     }
+    virtual const char * main_error_uri() const
+    {
+        if( ! nodes.empty() )
+            return nodes.front().error_uri;
+        return "<Unspecified error_uri>";
+    }
 
     bool empty() const { return nodes.empty(); }
     size_t size() const { return nodes.size(); }

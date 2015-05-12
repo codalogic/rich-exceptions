@@ -55,6 +55,8 @@ void test_single_exception_class()
 
     VerifyCritical( nested_exception.size() == 1, "Is exception size correct?" );
 
+    Verify( strcmp( nested_exception.main_error_uri(), "com.codalogic.nexp.test1" ) == 0, "Is 'main_error_uri()' OK?" );
+
     Verify( strcmp( nested_exception.what(), "First exception test" ) == 0, "Is 'what()' description OK?" );
 
     std::exception & r_std_exception( nested_exception );
@@ -64,9 +66,54 @@ void test_single_exception_class()
     Verify( nested_exception.to_string() == "com.codalogic.nexp.test1: First exception test\n", "Is nested_exception.to_string() correct?" );
 }
 
+void throw_2_first()
+{
+    throw NestedException( "com.codalogic.nexp.test_2_first", "First exception of 2 test" );
+}
+
+void throw_2_second()
+{
+    try
+    {
+        throw_2_first();
+    }
+    catch( NestedException & e )
+    {
+        throw NestedException( "com.codalogic.nexp.test_2_second", "Second exception of 2 test", e );
+    }
+}
+
+void test_throw_2()
+{
+    try
+    {
+        throw_2_second();
+    }
+    catch( NestedException & e )
+    {
+        VerifyCritical( ! e.empty(), "Is throw_2 exception non-empty?" );
+
+        VerifyCritical( e.size() == 2, "Is throw_2 exception size correct?" );
+
+        Verify( strcmp( e.main_error_uri(), "com.codalogic.nexp.test_2_second" ) == 0, "Is throw_2 'main_error_uri()' OK?" );
+
+        Verify( strcmp( e.what(), "Second exception of 2 test" ) == 0, "Is throw_2 'what()' description OK?" );
+
+        std::exception & r_std_exception( e );
+
+        Verify( strcmp( e.what(), "Second exception of 2 test" ) == 0, "Is throw_2 'what()' accessible via std::exception base?" );
+
+        Verify( e.to_string() == "com.codalogic.nexp.test_2_second: Second exception of 2 test\n"
+                                    "  com.codalogic.nexp.test_2_first: First exception of 2 test\n",
+                                "Is throw_2 nested_exception.to_string() correct?" );
+    }
+}
+
 int main( int argc, char * argv[] )
 {
     test_single_exception_class();
+
+    test_throw_2();
 
     report();
 
