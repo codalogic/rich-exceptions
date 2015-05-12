@@ -50,10 +50,13 @@ void Bad( const std::string & msg )
     ++n_bad_things;
 }
 
-void Verify( bool result, const std::string & msg )
+bool Verify( bool result, const std::string & msg )
 {
     result ? Good( msg ) : Bad( msg );
+    return result;
 }
+
+#define VerifyCritical( t, m ) if( ! Verify( t, m ) ) return;
 
 void report()
 {
