@@ -58,6 +58,8 @@ void test_single_exception_class()
     std::exception & r_std_exception( nested_exception );
 
     Verify( strcmp( r_std_exception.what(), "First exception test" ) == 0, "Is 'what()' accessible via std::exception base?" );
+
+    Verify( nested_exception.to_string() == "com.codalogic.nexp.test1: First exception test\n", "Is nested_exception.to_string() correct?" );
 }
 
 int main( int argc, char * argv[] )

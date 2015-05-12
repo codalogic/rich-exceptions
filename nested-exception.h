@@ -105,6 +105,13 @@ public:
     const NestedExceptionParameter & operator []( size_t i ) const { return params[i]; }
     NestedExceptionParameter & operator []( size_t i ) { return params[i]; }
 
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+
     friend std::ostream & operator << ( std::ostream & os, const NestedExceptionParams & r_params )
     {
         bool is_first = true;
@@ -144,6 +151,13 @@ struct NestedExceptionNode
         error_params( error_params_in ),
         description( description_in )
     {
+    }
+
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
     }
 
     friend std::ostream & operator << ( std::ostream & os, const NestedExceptionNode & r_node )
@@ -220,6 +234,13 @@ public:
     }
     bool empty() const { return nodes.empty(); }
 
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+
     class NestedExceptionPrinter
     {
     private:
@@ -231,7 +252,7 @@ public:
         {}
         void operator()( const NestedExceptionNode & r_node )
         {
-            os << std::string( 2 * indent, ' ' ) << r_node;
+            os << std::string( 2 * indent, ' ' ) << r_node << "\n";
         }
     };
 
@@ -239,6 +260,7 @@ public:
     {
         NestedExceptionPrinter nested_exception_pointer( os );
         r_exception.inspect( nested_exception_pointer );
+        return os;
     }
 };
 
