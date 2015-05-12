@@ -109,11 +109,35 @@ void test_throw_2()
     }
 }
 
+void test_params_storage()
+{
+}
+
+void test_exception_with_params()
+{
+}
+
+void test_throw_2_with_params()
+{
+}
+
+void test_throw_2_with_derived_exceptions()
+{
+}
+
 int main( int argc, char * argv[] )
 {
     test_single_exception_class();
 
     test_throw_2();
+
+    test_params_storage();
+
+    test_exception_with_params();
+
+    test_throw_2_with_params();
+
+    test_throw_2_with_derived_exceptions();
 
     report();
 
