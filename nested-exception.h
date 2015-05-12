@@ -221,6 +221,7 @@ public:
     }
 
     bool empty() const { return nodes.empty(); }
+    size_t size() const { return nodes.size(); }
 
     const_reference front() const { return nodes.front(); }
     const_iterator begin() const { return nodes.begin(); }

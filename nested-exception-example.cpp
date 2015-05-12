@@ -53,6 +53,8 @@ void test_single_exception_class()
 
     VerifyCritical( ! nested_exception.empty(), "Is exception non-empty?" );
 
+    VerifyCritical( nested_exception.size() == 1, "Is exception size correct?" );
+
     Verify( strcmp( nested_exception.what(), "First exception test" ) == 0, "Is 'what()' description OK?" );
 
     std::exception & r_std_exception( nested_exception );
