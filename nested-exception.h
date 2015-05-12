@@ -177,6 +177,10 @@ private:
     mutable nodes_t nodes;
 
 public:
+    typedef nodes_t::const_iterator const_iterator;
+    typedef nodes_t::const_reverse_iterator const_reverse_iterator;
+    typedef nodes_t::const_reference const_reference;
+
     NestedException(
             const char * const error_uri_in,
             const char * const description_in )
@@ -216,23 +220,13 @@ public:
         return "<Undescribed NestedException>";
     }
 
-    template< typename TinspectorFunctor >
-    void inspect( TinspectorFunctor & inspector ) const
-    {
-        for( nodes_t::const_iterator i( nodes.begin() ), i_end( nodes.end() );
-                i != i_end;
-                ++i )
-            inspector( *i );
-    }
-    template< typename TinspectorFunctor >
-    void reverse_inspect( TinspectorFunctor & inspector ) const
-    {
-        for( nodes_t::const_reverse_iterator i( nodes.rbegin() ), i_end( nodes.rend() );
-                i != i_end;
-                ++i )
-            inspector( *i );
-    }
     bool empty() const { return nodes.empty(); }
+
+    const_reference front() const { return nodes.front(); }
+    const_iterator begin() const { return nodes.begin(); }
+    const_iterator end() const { return nodes.end(); }
+    const_reverse_iterator rbegin() const { return nodes.rbegin(); }
+    const_reverse_iterator rend() const { return nodes.rend(); }
 
     std::string to_string() const
     {
@@ -241,25 +235,13 @@ public:
         return ss.str();
     }
 
-    class NestedExceptionPrinter
-    {
-    private:
-        size_t indent;
-        std::ostream & os;
-
-    public:
-        NestedExceptionPrinter( std::ostream & os_in ) : indent( 0 ), os( os_in )
-        {}
-        void operator()( const NestedExceptionNode & r_node )
-        {
-            os << std::string( 2 * indent, ' ' ) << r_node << "\n";
-        }
-    };
-
     friend std::ostream & operator << ( std::ostream & os, const NestedException & r_exception )
     {
-        NestedExceptionPrinter nested_exception_pointer( os );
-        r_exception.inspect( nested_exception_pointer );
+        size_t indent = 0;
+        for( NestedException::const_iterator i( r_exception.begin() ), i_end( r_exception.end() );
+                i != i_end;
+                ++i, indent += 2 )
+            os << std::string( indent, ' ' ) << *i << "\n";
         return os;
     }
 };
