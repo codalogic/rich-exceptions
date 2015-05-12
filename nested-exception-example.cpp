@@ -42,6 +42,7 @@
 
 #include <string>
 #include <iostream>
+#include <cstring>
 
 #include "annotate-lite.h"
 

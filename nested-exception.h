@@ -211,9 +211,9 @@ public:
         nodes.swap( r_prev_nested_exception.nodes );
         nodes.push_front( NestedExceptionNode( error_uri_in, error_params_in, description_in ) );
     }
-    virtual ~NestedException() {}
+    virtual ~NestedException() throw() {}
 
-    virtual const char * what() const
+    virtual const char * what() const throw()
     {
         if( ! nodes.empty() )
             return nodes.front().description;
