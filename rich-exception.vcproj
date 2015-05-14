@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="nested-exception"
+	Name="rich-exception"
 	ProjectGUID="{31439C50-1FC9-41A4-9E42-9A99663F172F}"
-	RootNamespace="nestedexception"
+	RootNamespace="richexception"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -175,11 +175,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nested-exception-example.cpp"
+				RelativePath=".\rich-exception-example.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\nested-exception.h"
+				RelativePath=".\rich-exception.h"
 				>
 			</File>
 		</Filter>
