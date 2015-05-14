@@ -46,7 +46,7 @@ namespace rich_excep {
 
 struct RichExceptionParameter
 {
-	// RichExceptionParameter ends up being immutable because it can only be accessed by const reference.
+    // RichExceptionParameter ends up being immutable because it can only be accessed by const reference.
 
     const char * name;
     std::string value;
@@ -150,7 +150,7 @@ struct RichExceptionNode
     }
     RichExceptionNode(
             const char * const error_uri_in,
-            RichExceptionParams & error_params_in,
+            const RichExceptionParams & error_params_in,
             const char * const description_in )
         :
         error_uri( error_uri_in ),
@@ -195,7 +195,7 @@ public:
     }
     RichException(
             const char * const error_uri_in,
-            RichExceptionParams & error_params_in,
+            const RichExceptionParams & error_params_in,
             const char * const description_in )
     {
         nodes.push_front( RichExceptionNode( error_uri_in, error_params_in, description_in ) );
@@ -210,7 +210,7 @@ public:
     }
     RichException(
             const char * const error_uri_in,
-            RichExceptionParams & error_params_in,
+            const RichExceptionParams & error_params_in,
             const char * const description_in,
             RichException & r_prev_rich_exception )
     {

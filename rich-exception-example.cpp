@@ -185,10 +185,93 @@ void show_throw_2_with_params()
 
 }
 
+struct FileException : public RichException
+{
+    FileException( const std::string & file_name_in )
+        :
+        RichException( "com.codalogic.file.noopen",
+                        RichExceptionParams( "name", file_name_in ),
+                        "Unable to open file" )
+    {}
+    FileException( const std::string & file_name_in, RichException & r_prev )
+        :
+        RichException( "com.codalogic.file.noopen",
+                        RichExceptionParams( "name", file_name_in ),
+                        "Unable to open file",
+                        r_prev )
+    {}
+};
+
+struct DatabaseException : public RichException
+{
+    DatabaseException( int row, int column )
+        :
+        RichException( "com.codalogic.database.badcell",
+                        "Unable to access database cell" )
+    {
+        add( "row", row );
+        add( "column", column );
+    }
+    DatabaseException( int row, int column, RichException & r_prev )
+        :
+        RichException( "com.codalogic.database.badcell",
+                        "Unable to access database cell",
+                        r_prev )
+    {
+        add( "row", row );
+        add( "column", column );
+    }
+};
+
+void throw_2_first_with_derived_exceptions()
+{
+    throw FileException( "abc.txt" );
+}
+
+void throw_2_second_with_derived_exceptions( int row, int column )
+{
+    try
+    {
+        throw_2_first_with_derived_exceptions();
+    }
+    catch( FileException & e )
+    {
+        throw DatabaseException( row, column, e );
+    }
+}
+
 void show_throw_2_with_derived_exceptions()
 {
     Suite( "show_throw_2_with_derived_exceptions()" );
 
+    try
+    {
+        throw_2_second_with_derived_exceptions( 1, 2 );
+        Bad( "throw_2_second_with_derived_exceptions() did not throw" );
+    }
+    catch( DatabaseException & e )
+    {
+        Good( "throw_2_second_with_derived_exceptions() threw" );
+        VerifyCritical( e.size() == 2, "Is DatabaseException correct size()?" );
+
+        RichException::const_iterator i_rich_exception = e.begin();
+
+        Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.database.badcell" ) == 0, "Is DatabaseException error_uri correct?" );
+        Verify( strcmp( i_rich_exception->description, "Unable to access database cell" ) == 0, "Is DatabaseException description correct?" );
+        VerifyCritical( i_rich_exception->error_params.size() == 2, "Is size of DatabaseException params correct?" );
+        Verify( strcmp( i_rich_exception->error_params[0].name, "row" ) == 0, "Is DatabaseException exception first param name correct?" );
+        Verify( i_rich_exception->error_params[0].value == "1", "Is DatabaseException exception first value name correct?" );
+        Verify( strcmp( i_rich_exception->error_params[1].name, "column" ) == 0, "Is DatabaseException exception 2nd param name correct?" );
+        Verify( i_rich_exception->error_params[1].value == "2", "Is DatabaseException exception 2nd value name correct?" );
+
+        ++i_rich_exception;
+
+        Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.file.noopen" ) == 0, "Is FileException error_uri correct?" );
+        Verify( strcmp( i_rich_exception->description, "Unable to open file" ) == 0, "Is FileException description correct?" );
+        VerifyCritical( i_rich_exception->error_params.size() == 1, "Is size of FileException params correct?" );
+        Verify( strcmp( i_rich_exception->error_params[0].name, "name" ) == 0, "Is FileException exception first param name correct?" );
+        Verify( i_rich_exception->error_params[0].value == "abc.txt", "Is FileException exception first value name correct?" );
+    }
 }
 
 int main( int argc, char * argv[] )
