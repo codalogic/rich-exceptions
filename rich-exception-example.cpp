@@ -38,7 +38,7 @@
 #pragma warning(error: 4239)
 #endif
 
-#include "nested-exception.h"
+#include "rich-exception.h"
 
 #include <string>
 #include <iostream>
@@ -46,30 +46,30 @@
 
 #include "annotate-lite.h"
 
-using namespace nest_excep;
+using namespace rich_excep;
 
 void test_single_exception_class()
 {
-    NestedException nested_exception( "com.codalogic.nexp.test1", "First exception test" );
+    RichException rich_exception( "com.codalogic.nexp.test1", "First exception test" );
 
-    VerifyCritical( ! nested_exception.empty(), "Is exception non-empty?" );
+    VerifyCritical( ! rich_exception.empty(), "Is exception non-empty?" );
 
-    VerifyCritical( nested_exception.size() == 1, "Is exception size correct?" );
+    VerifyCritical( rich_exception.size() == 1, "Is exception size correct?" );
 
-    Verify( strcmp( nested_exception.main_error_uri(), "com.codalogic.nexp.test1" ) == 0, "Is 'main_error_uri()' OK?" );
+    Verify( strcmp( rich_exception.main_error_uri(), "com.codalogic.nexp.test1" ) == 0, "Is 'main_error_uri()' OK?" );
 
-    Verify( strcmp( nested_exception.what(), "First exception test" ) == 0, "Is 'what()' description OK?" );
+    Verify( strcmp( rich_exception.what(), "First exception test" ) == 0, "Is 'what()' description OK?" );
 
-    std::exception & r_std_exception( nested_exception );
+    std::exception & r_std_exception( rich_exception );
 
     Verify( strcmp( r_std_exception.what(), "First exception test" ) == 0, "Is 'what()' accessible via std::exception base?" );
 
-    Verify( nested_exception.to_string() == "com.codalogic.nexp.test1: First exception test\n", "Is nested_exception.to_string() correct?" );
+    Verify( rich_exception.to_string() == "com.codalogic.nexp.test1: First exception test\n", "Is rich_exception.to_string() correct?" );
 }
 
 void throw_2_first()
 {
-    throw NestedException( "com.codalogic.nexp.test_2_first", "First exception of 2 test" );
+    throw RichException( "com.codalogic.nexp.test_2_first", "First exception of 2 test" );
 }
 
 void throw_2_second()
@@ -78,9 +78,9 @@ void throw_2_second()
     {
         throw_2_first();
     }
-    catch( NestedException & e )
+    catch( RichException & e )
     {
-        throw NestedException( "com.codalogic.nexp.test_2_second", "Second exception of 2 test", e );
+        throw RichException( "com.codalogic.nexp.test_2_second", "Second exception of 2 test", e );
     }
 }
 
@@ -90,7 +90,7 @@ void test_throw_2()
     {
         throw_2_second();
     }
-    catch( NestedException & e )
+    catch( RichException & e )
     {
         VerifyCritical( ! e.empty(), "Is throw_2 exception non-empty?" );
 
@@ -106,7 +106,7 @@ void test_throw_2()
 
         Verify( e.to_string() == "com.codalogic.nexp.test_2_second: Second exception of 2 test\n"
                                     "  com.codalogic.nexp.test_2_first: First exception of 2 test\n",
-                                "Is throw_2 nested_exception.to_string() correct?" );
+                                "Is throw_2 rich_exception.to_string() correct?" );
     }
 }
 

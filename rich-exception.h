@@ -31,8 +31,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
-#ifndef NESTED_EXCEPTION
-#define NESTED_EXCEPTION
+#ifndef RICH_EXCEPTION
+#define RICH_EXCEPTION
 
 #include <exception>
 #include <string>
@@ -41,43 +41,43 @@
 #include <ostream>
 #include <sstream>
 
-namespace nest_excep {
+namespace rich_excep {
 
-struct NestedExceptionParameter
+struct RichExceptionParameter
 {
     const char * name;
     std::string value;
 
-    NestedExceptionParameter(
+    RichExceptionParameter(
             const char * const name_in,
             std::string value_in )
         :
         name( name_in ),
         value( value_in )
     {}
-    friend std::ostream & operator << ( std::ostream & os, const NestedExceptionParameter & r_params )
+    friend std::ostream & operator << ( std::ostream & os, const RichExceptionParameter & r_params )
     {
         os << r_params.name << ": " << r_params.value;
         return os;
     }
 };
 
-class NestedExceptionParams
+class RichExceptionParams
 {
 private:
-    typedef std::vector< NestedExceptionParameter > params_t;
+    typedef std::vector< RichExceptionParameter > params_t;
     params_t params;
 
 public:
-    NestedExceptionParams() {}
-    NestedExceptionParams(
+    RichExceptionParams() {}
+    RichExceptionParams(
             const char * const name_in,
             const std::string & value_in )
     {
         add( name_in, value_in );
     }
     template< typename T >
-    NestedExceptionParams(
+    RichExceptionParams(
             const char * const name_in,
             const T & value_in )
     {
@@ -88,7 +88,7 @@ public:
             const char * const name_in,
             const std::string & value_in )
     {
-        params.push_back( NestedExceptionParameter( name_in, value_in ) );
+        params.push_back( RichExceptionParameter( name_in, value_in ) );
     }
     template< typename T >
     void add(
@@ -97,13 +97,13 @@ public:
     {
         std::stringstream ss;
         ss << value_in;
-        params.push_back( NestedExceptionParameter( name_in, ss.str() ) );
+        params.push_back( RichExceptionParameter( name_in, ss.str() ) );
     }
 
     bool empty() const { return params.empty(); }
     size_t size() const { return params.size(); }
-    const NestedExceptionParameter & operator []( size_t i ) const { return params[i]; }
-    NestedExceptionParameter & operator []( size_t i ) { return params[i]; }
+    const RichExceptionParameter & operator []( size_t i ) const { return params[i]; }
+    RichExceptionParameter & operator []( size_t i ) { return params[i]; }
 
     std::string to_string() const
     {
@@ -112,7 +112,7 @@ public:
         return ss.str();
     }
 
-    friend std::ostream & operator << ( std::ostream & os, const NestedExceptionParams & r_params )
+    friend std::ostream & operator << ( std::ostream & os, const RichExceptionParams & r_params )
     {
         bool is_first = true;
         for( params_t::const_iterator i( r_params.params.begin() ),
@@ -128,13 +128,13 @@ public:
     }
 };
 
-struct NestedExceptionNode
+struct RichExceptionNode
 {
     const char * const error_uri;   // of the form "com.codalogic.mymodule.myerror" or ".mymodule.myerror"
-    NestedExceptionParams error_params;
+    RichExceptionParams error_params;
     const char * const description; // Human readable description
 
-    NestedExceptionNode(
+    RichExceptionNode(
             const char * const error_uri_in,
             const char * const description_in )
         :
@@ -142,9 +142,9 @@ struct NestedExceptionNode
         description( description_in )
     {
     }
-    NestedExceptionNode(
+    RichExceptionNode(
             const char * const error_uri_in,
-            NestedExceptionParams & error_params_in,
+            RichExceptionParams & error_params_in,
             const char * const description_in )
         :
         error_uri( error_uri_in ),
@@ -160,7 +160,7 @@ struct NestedExceptionNode
         return ss.str();
     }
 
-    friend std::ostream & operator << ( std::ostream & os, const NestedExceptionNode & r_node )
+    friend std::ostream & operator << ( std::ostream & os, const RichExceptionNode & r_node )
     {
         os << r_node.error_uri;
         if( ! r_node.error_params.empty() )
@@ -170,10 +170,10 @@ struct NestedExceptionNode
     }
 };
 
-class NestedException : public std::exception
+class RichException : public std::exception
 {
 private:
-    typedef std::list< NestedExceptionNode > nodes_t;
+    typedef std::list< RichExceptionNode > nodes_t;
     mutable nodes_t nodes;
 
 public:
@@ -181,43 +181,43 @@ public:
     typedef nodes_t::const_reverse_iterator const_reverse_iterator;
     typedef nodes_t::const_reference const_reference;
 
-    NestedException(
+    RichException(
             const char * const error_uri_in,
             const char * const description_in )
     {
-        nodes.push_front( NestedExceptionNode( error_uri_in, description_in ) );
+        nodes.push_front( RichExceptionNode( error_uri_in, description_in ) );
     }
-    NestedException(
+    RichException(
             const char * const error_uri_in,
-            NestedExceptionParams & error_params_in,
+            RichExceptionParams & error_params_in,
             const char * const description_in )
     {
-        nodes.push_front( NestedExceptionNode( error_uri_in, error_params_in, description_in ) );
+        nodes.push_front( RichExceptionNode( error_uri_in, error_params_in, description_in ) );
     }
-    NestedException(
+    RichException(
             const char * const error_uri_in,
             const char * const description_in,
-            NestedException & r_prev_nested_exception )
+            RichException & r_prev_rich_exception )
     {
-        nodes.swap( r_prev_nested_exception.nodes );
-        nodes.push_front( NestedExceptionNode( error_uri_in, description_in ) );
+        nodes.swap( r_prev_rich_exception.nodes );
+        nodes.push_front( RichExceptionNode( error_uri_in, description_in ) );
     }
-    NestedException(
+    RichException(
             const char * const error_uri_in,
-            NestedExceptionParams & error_params_in,
+            RichExceptionParams & error_params_in,
             const char * const description_in,
-            NestedException & r_prev_nested_exception )
+            RichException & r_prev_rich_exception )
     {
-        nodes.swap( r_prev_nested_exception.nodes );
-        nodes.push_front( NestedExceptionNode( error_uri_in, error_params_in, description_in ) );
+        nodes.swap( r_prev_rich_exception.nodes );
+        nodes.push_front( RichExceptionNode( error_uri_in, error_params_in, description_in ) );
     }
-    virtual ~NestedException() throw() {}
+    virtual ~RichException() throw() {}
 
     virtual const char * what() const throw()
     {
         if( ! nodes.empty() )
             return nodes.front().description;
-        return "<Undescribed NestedException>";
+        return "<Undescribed RichException>";
     }
     virtual const char * main_error_uri() const
     {
@@ -242,10 +242,10 @@ public:
         return ss.str();
     }
 
-    friend std::ostream & operator << ( std::ostream & os, const NestedException & r_exception )
+    friend std::ostream & operator << ( std::ostream & os, const RichException & r_exception )
     {
         size_t indent = 0;
-        for( NestedException::const_iterator i( r_exception.begin() ), i_end( r_exception.end() );
+        for( RichException::const_iterator i( r_exception.begin() ), i_end( r_exception.end() );
                 i != i_end;
                 ++i, indent += 2 )
             os << std::string( indent, ' ' ) << *i << "\n";
@@ -253,6 +253,6 @@ public:
     }
 };
 
-}   // Namespace namespace nest_excep
+}   // Namespace namespace rich_excep
 
-#endif  // NESTED_EXCEPTION
+#endif  // RICH_EXCEPTION
