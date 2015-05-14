@@ -46,6 +46,8 @@ namespace rich_excep {
 
 struct RichExceptionParameter
 {
+	// RichExceptionParameter ends up being immutable because it can only be accessed by const reference.
+
     const char * name;
     std::string value;
 
