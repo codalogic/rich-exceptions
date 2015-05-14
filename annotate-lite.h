@@ -39,6 +39,13 @@
 
 int n_bad_things = 0;
 
+void Suite( const std::string & msg )
+{
+    std::cout << "\n";
+    std::cout << "        " << msg << "\n";
+    std::cout << "        " << std::string( msg.size(), '=' ) << "\n";
+}
+
 void Good( const std::string & msg )
 {
     std::cout << "    ok: " << msg << "\n";
