@@ -56,6 +56,7 @@ struct RichExceptionParameter
         name( name_in ),
         value( value_in )
     {}
+
     friend std::ostream & operator << ( std::ostream & os, const RichExceptionParameter & r_params )
     {
         os << r_params.name << ": " << r_params.value;
