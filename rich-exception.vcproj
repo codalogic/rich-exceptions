@@ -179,6 +179,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\rich-exception-linkage-check.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\rich-exception.h"
 				>
 			</File>

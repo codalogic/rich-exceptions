@@ -41,6 +41,8 @@
 #include <ostream>
 #include <sstream>
 #include <cassert>
+#include <algorithm>
+#include <cstring>
 
 namespace rich_excep {
 
@@ -109,6 +111,31 @@ public:
     bool empty() const { return params.empty(); }
     size_t size() const { return params.size(); }
     const RichExceptionParameter & operator []( size_t i ) const { return params[i]; }
+
+    class find_name_predicate
+    {
+    private:
+        const char * seeking;
+    public:
+        find_name_predicate( const char * seeking_in ) : seeking( seeking_in ) {}
+        bool operator () ( const RichExceptionParameter & at ) { return strcmp( seeking, at.name ) == 0; }
+    };
+    bool has( const char * name_in ) const
+    {
+        return std::find_if( params.begin(), params.end(), find_name_predicate( name_in ) ) != params.end();
+    }
+    const std::string & get( const char * name_in ) const   // Would use operator [], but conflicts with operator [](size_t)
+    {
+        params_t::const_iterator i = std::find_if( params.begin(), params.end(), find_name_predicate( name_in ) );
+        if( i != params.end() )
+            return i->value;
+        return param_not_found();
+    }
+    static const std::string & param_not_found()
+    {
+        static std::string not_found;
+        return not_found;
+    }
 
     std::string to_string() const
     {

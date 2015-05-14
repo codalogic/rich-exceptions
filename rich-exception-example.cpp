@@ -48,6 +48,8 @@
 
 using namespace rich_excep;
 
+void show_multiple_linkage_ok();
+
 void show_single_exception_class()
 {
     Suite( "show_single_exception_class()" );
@@ -179,12 +181,6 @@ void show_exception_with_params()
     }
 }
 
-void show_throw_2_with_params()
-{
-    Suite( "show_throw_2_with_params()" );
-
-}
-
 struct FileException : public RichException
 {
     FileException( const std::string & file_name_in )
@@ -258,20 +254,45 @@ void show_throw_2_with_derived_exceptions()
 
         Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.database.badcell" ) == 0, "Is DatabaseException error_uri correct?" );
         Verify( strcmp( i_rich_exception->description, "Unable to access database cell" ) == 0, "Is DatabaseException description correct?" );
+
         VerifyCritical( i_rich_exception->error_params.size() == 2, "Is size of DatabaseException params correct?" );
-        Verify( strcmp( i_rich_exception->error_params[0].name, "row" ) == 0, "Is DatabaseException exception first param name correct?" );
+
+        Verify( strcmp( i_rich_exception->error_params[0].name, "row" ) == 0, "Is DatabaseException exception first param correct?" );
         Verify( i_rich_exception->error_params[0].value == "1", "Is DatabaseException exception first value name correct?" );
+
         Verify( strcmp( i_rich_exception->error_params[1].name, "column" ) == 0, "Is DatabaseException exception 2nd param name correct?" );
-        Verify( i_rich_exception->error_params[1].value == "2", "Is DatabaseException exception 2nd value name correct?" );
+        Verify( i_rich_exception->error_params[1].value == "2", "Is DatabaseException exception 2nd value correct?" );
 
         ++i_rich_exception;
 
         Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.file.noopen" ) == 0, "Is FileException error_uri correct?" );
         Verify( strcmp( i_rich_exception->description, "Unable to open file" ) == 0, "Is FileException description correct?" );
+
         VerifyCritical( i_rich_exception->error_params.size() == 1, "Is size of FileException params correct?" );
+
         Verify( strcmp( i_rich_exception->error_params[0].name, "name" ) == 0, "Is FileException exception first param name correct?" );
-        Verify( i_rich_exception->error_params[0].value == "abc.txt", "Is FileException exception first value name correct?" );
+        Verify( i_rich_exception->error_params[0].value == "abc.txt", "Is FileException exception first value correct?" );
     }
+}
+
+void show_has_and_get_parameter_access()
+{
+    Suite( "show_has_and_get_parameter_access()" );
+
+    DatabaseException database_exception( 1, 2 );
+
+    VerifyCritical( database_exception.size() == 1, "Is DatabaseException correct size()?" );
+
+    RichException::const_iterator i_rich_exception = database_exception.begin();
+
+    Verify( i_rich_exception->error_params.has( "row" ), "Does DatabaseException exception have row member?" );
+    Verify( i_rich_exception->error_params.get( "row" ) == "1", "Is DatabaseException exception row value correct?" );
+
+    Verify( i_rich_exception->error_params.has( "column" ), "Does DatabaseException exception have column member?" );
+    Verify( i_rich_exception->error_params.get( "column" ) == "2", "Is DatabaseException exception column value correct?" );
+
+    Verify( ! i_rich_exception->error_params.has( "Not there" ), "Is DatabaseException exception unknown param absent?" );
+    Verify( i_rich_exception->error_params.get( "Not there" ) == "", "Is DatabaseException exception unknown param safely returned?" );
 }
 
 int main( int argc, char * argv[] )
@@ -284,9 +305,9 @@ int main( int argc, char * argv[] )
 
     show_exception_with_params();
 
-    show_throw_2_with_params();
-
     show_throw_2_with_derived_exceptions();
+
+    show_has_and_get_parameter_access();
 
     report();
 
