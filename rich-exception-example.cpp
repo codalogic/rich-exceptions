@@ -48,30 +48,30 @@
 
 using namespace rich_excep;
 
-void test_single_exception_class()
+void show_single_exception_class()
 {
-    Suite( "test_single_exception_class()" );
+    Suite( "show_single_exception_class()" );
 
-    RichException rich_exception( "com.codalogic.nexp.test1", "First exception test" );
+    RichException rich_exception( "com.codalogic.nexp.show1", "First exception show" );
 
     VerifyCritical( ! rich_exception.empty(), "Is exception non-empty?" );
 
     VerifyCritical( rich_exception.size() == 1, "Is exception size correct?" );
 
-    Verify( strcmp( rich_exception.main_error_uri(), "com.codalogic.nexp.test1" ) == 0, "Is 'main_error_uri()' OK?" );
+    Verify( strcmp( rich_exception.main_error_uri(), "com.codalogic.nexp.show1" ) == 0, "Is 'main_error_uri()' OK?" );
 
-    Verify( strcmp( rich_exception.what(), "First exception test" ) == 0, "Is 'what()' description OK?" );
+    Verify( strcmp( rich_exception.what(), "First exception show" ) == 0, "Is 'what()' description OK?" );
 
     std::exception & r_std_exception( rich_exception );
 
-    Verify( strcmp( r_std_exception.what(), "First exception test" ) == 0, "Is 'what()' accessible via std::exception base?" );
+    Verify( strcmp( r_std_exception.what(), "First exception show" ) == 0, "Is 'what()' accessible via std::exception base?" );
 
-    Verify( rich_exception.to_string() == "com.codalogic.nexp.test1: First exception test\n", "Is rich_exception.to_string() correct?" );
+    Verify( rich_exception.to_string() == "com.codalogic.nexp.show1: First exception show\n", "Is rich_exception.to_string() correct?" );
 }
 
 void throw_2_first()
 {
-    throw RichException( "com.codalogic.nexp.test_2_first", "First exception of 2 test" );
+    throw RichException( "com.codalogic.nexp.show_2_first", "First exception of 2 show" );
 }
 
 void throw_2_second()
@@ -82,11 +82,11 @@ void throw_2_second()
     }
     catch( RichException & e )
     {
-        throw RichException( "com.codalogic.nexp.test_2_second", "Second exception of 2 test", e );
+        throw RichException( "com.codalogic.nexp.show_2_second", "Second exception of 2 show", e );
     }
 }
 
-void test_throw_2()
+void show_throw_2()
 {
     try
     {
@@ -98,31 +98,31 @@ void test_throw_2()
 
         VerifyCritical( e.size() == 2, "Is throw_2 exception size correct?" );
 
-        Verify( strcmp( e.main_error_uri(), "com.codalogic.nexp.test_2_second" ) == 0, "Is throw_2 'main_error_uri()' OK?" );
+        Verify( strcmp( e.main_error_uri(), "com.codalogic.nexp.show_2_second" ) == 0, "Is throw_2 'main_error_uri()' OK?" );
 
-        Verify( strcmp( e.what(), "Second exception of 2 test" ) == 0, "Is throw_2 'what()' description OK?" );
+        Verify( strcmp( e.what(), "Second exception of 2 show" ) == 0, "Is throw_2 'what()' description OK?" );
 
         std::exception & r_std_exception( e );
 
-        Verify( strcmp( e.what(), "Second exception of 2 test" ) == 0, "Is throw_2 'what()' accessible via std::exception base?" );
+        Verify( strcmp( e.what(), "Second exception of 2 show" ) == 0, "Is throw_2 'what()' accessible via std::exception base?" );
 
-        Verify( e.to_string() == "com.codalogic.nexp.test_2_second: Second exception of 2 test\n"
-                                    "  com.codalogic.nexp.test_2_first: First exception of 2 test\n",
+        Verify( e.to_string() == "com.codalogic.nexp.show_2_second: Second exception of 2 show\n"
+                                    "  com.codalogic.nexp.show_2_first: First exception of 2 show\n",
                                 "Is throw_2 rich_exception.to_string() correct?" );
     }
 }
 
-void test_params_storage()
+void show_params_storage()
 {
-    Suite( "test_params_storage()" );
+    Suite( "show_params_storage()" );
 
-    RichException rich_exception_1( "com.codalogic.nexp.test_params_storage.1",
+    RichException rich_exception_1( "com.codalogic.nexp.show_params_storage.1",
                                     RichExceptionParams( "p1_1", "v1_1" ).add( "p1_2", 2 ).add( "p1_3", 3.0 ),
-                                    "First test params exception 1 test" );
+                                    "First show params exception 1 show" );
 
-    RichException rich_exception_2( "com.codalogic.nexp.test_params_storage.2",
+    RichException rich_exception_2( "com.codalogic.nexp.show_params_storage.2",
                                     RichExceptionParams( "p2_1", "v2_1" ).add( "p2_2", 2 ).add( "p2_3", 3.0 ),
-                                    "First test params exception 2 test",
+                                    "First show params exception 2 show",
                                     rich_exception_1 );
 
     Verify( rich_exception_1.size() == 0, "Has rich_exception_1 contents been passed to rich_exception_2?" );
@@ -130,8 +130,8 @@ void test_params_storage()
 
     RichException::const_iterator i_rich_exception = rich_exception_2.begin();
 
-    Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.nexp.test_params_storage.2" ) == 0, "Is first error_uri correct?" );
-    Verify( strcmp( i_rich_exception->description, "First test params exception 2 test" ) == 0, "Is first description correct?" );
+    Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.nexp.show_params_storage.2" ) == 0, "Is first error_uri correct?" );
+    Verify( strcmp( i_rich_exception->description, "First show params exception 2 show" ) == 0, "Is first description correct?" );
     VerifyCritical( i_rich_exception->error_params.size() == 3, "Is size of first params correct?" );
     Verify( strcmp( i_rich_exception->error_params[0].name, "p2_1" ) == 0, "Is first exception first param name correct?" );
     Verify( i_rich_exception->error_params[0].value == "v2_1", "Is first exception first value name correct?" );
@@ -142,8 +142,8 @@ void test_params_storage()
 
     ++i_rich_exception;
 
-    Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.nexp.test_params_storage.1" ) == 0, "Is 2nd error_uri correct?" );
-    Verify( strcmp( i_rich_exception->description, "First test params exception 1 test" ) == 0, "Is 2nd description correct?" );
+    Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.nexp.show_params_storage.1" ) == 0, "Is 2nd error_uri correct?" );
+    Verify( strcmp( i_rich_exception->description, "First show params exception 1 show" ) == 0, "Is 2nd description correct?" );
     VerifyCritical( i_rich_exception->error_params.size() == 3, "Is size of 2nd params correct?" );
     Verify( strcmp( i_rich_exception->error_params[0].name, "p1_1" ) == 0, "Is 2nd exception first param name correct?" );
     Verify( i_rich_exception->error_params[0].value == "v1_1", "Is 2nd exception first value name correct?" );
@@ -159,12 +159,12 @@ void test_params_storage()
 
 void throw_rich_exception_with_params()
 {
-    throw RichException( "com.codalogic.nexp.test_throw_with_params", "Throw with params" ).add( "p1", "first" ).add( "p2", 2 );
+    throw RichException( "com.codalogic.nexp.show_throw_with_params", "Throw with params" ).add( "p1", "first" ).add( "p2", 2 );
 }
 
-void test_exception_with_params()
+void show_exception_with_params()
 {
-    Suite( "test_exception_with_params()" );
+    Suite( "show_exception_with_params()" );
 
     try
     {
@@ -174,36 +174,36 @@ void test_exception_with_params()
     catch( RichException & e )
     {
         Good( "throw_rich_exception_with_params threw" );
-        Verify( e.to_string() == "com.codalogic.nexp.test_throw_with_params (p1: first, p2: 2): Throw with params\n",
+        Verify( e.to_string() == "com.codalogic.nexp.show_throw_with_params (p1: first, p2: 2): Throw with params\n",
                                 "Is throw_rich_exception_with_params to_string() correct?" );
     }
 }
 
-void test_throw_2_with_params()
+void show_throw_2_with_params()
 {
-    Suite( "test_throw_2_with_params()" );
+    Suite( "show_throw_2_with_params()" );
 
 }
 
-void test_throw_2_with_derived_exceptions()
+void show_throw_2_with_derived_exceptions()
 {
-    Suite( "test_throw_2_with_derived_exceptions()" );
+    Suite( "show_throw_2_with_derived_exceptions()" );
 
 }
 
 int main( int argc, char * argv[] )
 {
-    test_single_exception_class();
+    show_single_exception_class();
 
-    test_throw_2();
+    show_throw_2();
 
-    test_params_storage();
+    show_params_storage();
 
-    test_exception_with_params();
+    show_exception_with_params();
 
-    test_throw_2_with_params();
+    show_throw_2_with_params();
 
-    test_throw_2_with_derived_exceptions();
+    show_throw_2_with_derived_exceptions();
 
     report();
 
