@@ -114,8 +114,24 @@ void test_params_storage()
 {
 }
 
+void throw_rich_exception_with_params()
+{
+    throw RichException( "com.codalogic.nexp.test_throw_with_params", "Throw with params" ).add( "p1", "first" ).add( "p2", 2 );
+}
+
 void test_exception_with_params()
 {
+    try
+    {
+        throw_rich_exception_with_params();
+        Bad( "throw_rich_exception_with_params did not throw" );
+    }
+    catch( RichException & e )
+    {
+        Good( "throw_rich_exception_with_params threw" );
+        Verify( e.to_string() == "com.codalogic.nexp.test_throw_with_params (p1: first, p2: 2): Throw with params\n",
+                                "Is throw_rich_exception_with_params to_string() correct?" );
+    }
 }
 
 void test_throw_2_with_params()

@@ -40,6 +40,7 @@
 #include <list>
 #include <ostream>
 #include <sstream>
+#include <cassert>
 
 namespace rich_excep {
 
@@ -123,6 +124,7 @@ public:
             if( ! is_first )
                 os << ", ";
             os << *i;
+            is_first = false;
         }
         return os;
     }
@@ -212,6 +214,24 @@ public:
         nodes.push_front( RichExceptionNode( error_uri_in, error_params_in, description_in ) );
     }
     virtual ~RichException() throw() {}
+
+    RichException & add(
+            const char * const name_in,
+            const std::string & value_in )
+    {
+        assert( ! nodes.empty() );
+        nodes.front().error_params.add( name_in, value_in );
+        return *this;
+    }
+    template< typename T >
+    RichException & add(
+            const char * const name_in,
+            const T & value_in )
+    {
+        assert( ! nodes.empty() );
+        nodes.front().error_params.add( name_in, value_in );
+        return *this;
+    }
 
     virtual const char * what() const throw()
     {
