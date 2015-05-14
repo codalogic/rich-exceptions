@@ -50,6 +50,8 @@ using namespace rich_excep;
 
 void test_single_exception_class()
 {
+    Suite( "test_single_exception_class()" );
+
     RichException rich_exception( "com.codalogic.nexp.test1", "First exception test" );
 
     VerifyCritical( ! rich_exception.empty(), "Is exception non-empty?" );
@@ -112,6 +114,47 @@ void test_throw_2()
 
 void test_params_storage()
 {
+    Suite( "test_params_storage()" );
+
+    RichException rich_exception_1( "com.codalogic.nexp.test_params_storage.1",
+                                    RichExceptionParams( "p1_1", "v1_1" ).add( "p1_2", 2 ).add( "p1_3", 3.0 ),
+                                    "First test params exception 1 test" );
+
+    RichException rich_exception_2( "com.codalogic.nexp.test_params_storage.2",
+                                    RichExceptionParams( "p2_1", "v2_1" ).add( "p2_2", 2 ).add( "p2_3", 3.0 ),
+                                    "First test params exception 2 test",
+                                    rich_exception_1 );
+
+    Verify( rich_exception_1.size() == 0, "Has rich_exception_1 contents been passed to rich_exception_2?" );
+    VerifyCritical( rich_exception_2.size() == 2, "Is rich_exception_2 exception size correct?" );
+
+    RichException::const_iterator i_rich_exception = rich_exception_2.begin();
+
+    Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.nexp.test_params_storage.2" ) == 0, "Is first error_uri correct?" );
+    Verify( strcmp( i_rich_exception->description, "First test params exception 2 test" ) == 0, "Is first description correct?" );
+    VerifyCritical( i_rich_exception->error_params.size() == 3, "Is size of first params correct?" );
+    Verify( strcmp( i_rich_exception->error_params[0].name, "p2_1" ) == 0, "Is first exception first param name correct?" );
+    Verify( i_rich_exception->error_params[0].value == "v2_1", "Is first exception first value name correct?" );
+    Verify( strcmp( i_rich_exception->error_params[1].name, "p2_2" ) == 0, "Is first exception 2nd param name correct?" );
+    Verify( i_rich_exception->error_params[1].value == "2", "Is first exception 2nd value name correct?" );
+    Verify( strcmp( i_rich_exception->error_params[2].name, "p2_3" ) == 0, "Is first exception 3rd param name correct?" );
+    Verify( i_rich_exception->error_params[2].value == "3", "Is first exception 3rd value name correct?" );
+
+    ++i_rich_exception;
+
+    Verify( strcmp( i_rich_exception->error_uri, "com.codalogic.nexp.test_params_storage.1" ) == 0, "Is 2nd error_uri correct?" );
+    Verify( strcmp( i_rich_exception->description, "First test params exception 1 test" ) == 0, "Is 2nd description correct?" );
+    VerifyCritical( i_rich_exception->error_params.size() == 3, "Is size of 2nd params correct?" );
+    Verify( strcmp( i_rich_exception->error_params[0].name, "p1_1" ) == 0, "Is 2nd exception first param name correct?" );
+    Verify( i_rich_exception->error_params[0].value == "v1_1", "Is 2nd exception first value name correct?" );
+    Verify( strcmp( i_rich_exception->error_params[1].name, "p1_2" ) == 0, "Is 2nd exception 2nd param name correct?" );
+    Verify( i_rich_exception->error_params[1].value == "2", "Is 2nd exception 2nd value name correct?" );
+    Verify( strcmp( i_rich_exception->error_params[2].name, "p1_3" ) == 0, "Is 2nd exception 3rd param name correct?" );
+    Verify( i_rich_exception->error_params[2].value == "3", "Is 2nd exception 3rd value name correct?" );
+
+    ++i_rich_exception;
+
+    Verify( i_rich_exception == rich_exception_2.end(), "Has iterator reached end()?" );
 }
 
 void throw_rich_exception_with_params()
@@ -121,6 +164,8 @@ void throw_rich_exception_with_params()
 
 void test_exception_with_params()
 {
+    Suite( "test_exception_with_params()" );
+
     try
     {
         throw_rich_exception_with_params();
@@ -136,10 +181,14 @@ void test_exception_with_params()
 
 void test_throw_2_with_params()
 {
+    Suite( "test_throw_2_with_params()" );
+
 }
 
 void test_throw_2_with_derived_exceptions()
 {
+    Suite( "test_throw_2_with_derived_exceptions()" );
+
 }
 
 int main( int argc, char * argv[] )

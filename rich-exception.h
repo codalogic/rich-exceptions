@@ -51,7 +51,7 @@ struct RichExceptionParameter
 
     RichExceptionParameter(
             const char * const name_in,
-            std::string value_in )
+            const std::string value_in )
         :
         name( name_in ),
         value( value_in )
@@ -85,26 +85,27 @@ public:
         add( name_in, value_in );
     }
 
-    void add(
+    RichExceptionParams & add(
             const char * const name_in,
             const std::string & value_in )
     {
         params.push_back( RichExceptionParameter( name_in, value_in ) );
+        return *this;
     }
     template< typename T >
-    void add(
+    RichExceptionParams & add(
             const char * const name_in,
             const T & value_in )
     {
         std::stringstream ss;
         ss << value_in;
         params.push_back( RichExceptionParameter( name_in, ss.str() ) );
+        return *this;
     }
 
     bool empty() const { return params.empty(); }
     size_t size() const { return params.size(); }
     const RichExceptionParameter & operator []( size_t i ) const { return params[i]; }
-    RichExceptionParameter & operator []( size_t i ) { return params[i]; }
 
     std::string to_string() const
     {
