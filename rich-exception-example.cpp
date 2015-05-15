@@ -295,6 +295,145 @@ void show_has_and_get_parameter_access()
     Verify( i_rich_exception->error_params.get( "Not there" ) == "", "Is DatabaseException exception unknown param safely returned?" );
 }
 
+// Reworked from https://github.com/codalogic/safe-divide
+
+template< typename Texception >
+double safe_divide( double i, double j )
+{
+    if( j == 0.0 ) throw Texception();
+    return i / j;
+}
+
+struct or_k_is_zero : public RichException
+{
+    or_k_is_zero()
+        :
+        RichException( "com.codalogic.f1.safe_divide.k_is_0",
+                        "Divide by zero error" )
+    {}
+    or_k_is_zero( RichException & r_prev )
+        :
+        RichException( "com.codalogic.f1.safe_divide.k_is_0",
+                        "Divide by zero error",
+                        r_prev )
+    {}
+};
+
+template< typename Texception >
+double f1( double i, double j, double k )
+{
+    try
+    {
+        return i + safe_divide<or_k_is_zero>(j,k);
+    }
+    catch( or_k_is_zero & e )
+    {
+        throw Texception( e );
+    }
+}
+
+struct or_default_f1_k_is_zero : public RichException
+{
+    static const char * const default_error_uri()
+    {
+        static const char * const error_uri = "com.codalogic.f1.default.k_is_0";
+        return error_uri;
+    }
+    static const char * const default_description()
+    {
+        static const char * const description = "Divide by zero error";
+        return description;
+    }
+
+    or_default_f1_k_is_zero()
+        :
+        RichException( default_error_uri(), default_description() )
+    {}
+    or_default_f1_k_is_zero( RichException & r_prev )
+        :
+        RichException( default_error_uri(), default_description(), r_prev )
+    {}
+    or_default_f1_k_is_zero( const char * error_uri_in, const char * description_in )
+        :
+        RichException( error_uri_in, description_in )
+    {}
+    or_default_f1_k_is_zero( const char * error_uri_in, const char * description_in, RichException & r_prev )
+        :
+        RichException( error_uri_in, description_in, r_prev )
+    {}
+};
+
+struct or_k1_is_zero : public or_default_f1_k_is_zero
+{
+    static const char * const error_uri()
+    {
+        static const char * const my_error_uri = "com.codalogic.show_rework_of_safe_divide_project.f1.k1_is_0";
+        return my_error_uri;
+    }
+    static const char * const description()
+    {
+        static const char * const my_description = "Divide by zero error";
+        return my_description;
+    }
+
+    or_k1_is_zero()
+        :
+        or_default_f1_k_is_zero( error_uri(), description() )
+    {}
+    or_k1_is_zero( RichException & r_prev )
+        :
+        or_default_f1_k_is_zero( error_uri(), description(), r_prev )
+    {}
+};
+
+struct or_k2_is_zero : public or_default_f1_k_is_zero
+{
+    static const char * const error_uri()
+    {
+        static const char * const my_error_uri = "com.codalogic.show_rework_of_safe_divide_project.f1.k2_is_0";
+        return my_error_uri;
+    }
+    static const char * const description()
+    {
+        static const char * const my_description = "Divide by zero error";
+        return my_description;
+    }
+
+    or_k2_is_zero()
+        :
+        or_default_f1_k_is_zero( error_uri(), description() )
+    {}
+    or_k2_is_zero( RichException & r_prev )
+        :
+        or_default_f1_k_is_zero( error_uri(), description(), r_prev )
+    {}
+};
+
+void show_rework_of_safe_divide_project()
+{
+    Suite( "show_rework_of_safe_divide_project()" );
+
+    try
+    {
+        double i=1.0, j=1.0, k1=1.0, k2=0.0;
+        double r = f1<or_k1_is_zero>( i, j, k1 ) +
+                    f1<or_k2_is_zero>( i, j, 0.0 );
+        Bad( "exception should not throw" );
+    }
+    catch( or_k1_is_zero & )
+    {
+        Bad( "or_k1_is_zero exception should not throw" );
+    }
+    catch( or_k2_is_zero & e )
+    {
+        Good( "or_k2_is_zero exception thrown" );
+        Verify( e.to_string() == "com.codalogic.show_rework_of_safe_divide_project.f1.k2_is_0: Divide by zero error\n"
+                                 "  com.codalogic.f1.safe_divide.k_is_0: Divide by zero error\n",
+                        "Is or_k2_is_zero exception to_string() correct?" );
+
+    }
+}
+
 int main( int argc, char * argv[] )
 {
     show_single_exception_class();
@@ -308,6 +447,8 @@ int main( int argc, char * argv[] )
     show_throw_2_with_derived_exceptions();
 
     show_has_and_get_parameter_access();
+
+    show_rework_of_safe_divide_project();
 
     report();
 
