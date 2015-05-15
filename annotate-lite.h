@@ -87,6 +87,6 @@ void report()
     std::cout << n_bad_things << " bad thing(s) happened\n";
 }
 
-#endif	// ANNOTATE_LITE_PROTOTYPES_ONLY
+#endif  // ANNOTATE_LITE_PROTOTYPES_ONLY
 
 #endif  // ANNOTATE_LITE_H
