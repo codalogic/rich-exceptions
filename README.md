@@ -130,12 +130,7 @@ void throw_2_second_with_derived_exceptions( int row, int column )
         throw DatabaseException( row, column, &e );
     }
 }
-```
 
-The exception hierarchy can be inspected by iteratong through using the
-the 
-
-```cpp
 void show_throw_2_with_derived_exceptions()
 {
     try
@@ -144,6 +139,16 @@ void show_throw_2_with_derived_exceptions()
 
         Bad( "throw_2_second_with_derived_exceptions() did not throw" );
     }
+    catch( DatabaseException & e )
+    {
+    ...
+```
+
+The exception hierarchy can be inspected by iterated through via the
+the `RichException::begin()` and `end()` methods.
+
+```cpp
+    ...
     catch( DatabaseException & e )
     {
         Good( "throw_2_second_with_derived_exceptions() threw" );
@@ -219,7 +224,7 @@ void show_has_and_get_parameter_access()
 ```
 
 As can be seen in the above example, trying to `get()` a non-existant
-parameter will return an empty string.
+parameter returns an empty string.
 
 Warnings
 ========
