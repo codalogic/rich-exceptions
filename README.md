@@ -193,6 +193,13 @@ the `RichException::begin()` and `end()` methods.
 }
 ```
 
+Naturally, (and possibly more sensibly when not trying to verify the code),
+an iterator-based for-loop can be used.
+
+When iterating through the exceptions, the most-recent (highest-level) exception
+is presented first.  `RichException::rbegin()` and `rend()` allow iterating in
+the reverse direction.
+
 Within each exception level, the name-value pairs can be accessed by integer
 index, or the `RichExceptionParams::has(...)` and `RichExceptionParams::get(...)`
 methods, for example:
