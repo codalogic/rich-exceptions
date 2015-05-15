@@ -31,11 +31,28 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------
+// A light-weight framework for annotating how example code is expected to
+// run.
+//
+// To use in multiple .cpp files, #define ANNOTATE_LITE_PROTOTYPES_ONLY before
+// #include "annotate-lite.h" to avoid multiple definitions of functions.
+//----------------------------------------------------------------------------
+
 #ifndef ANNOTATE_LITE_H
 #define ANNOTATE_LITE_H
 
 #include <string>
 #include <iostream>
+
+extern int n_bad_things;
+bool Verify( bool result, const std::string & msg );
+void Bad( const std::string & msg );
+void Good( const std::string & msg );
+void Suite( const std::string & msg );
+void report();
+
+#ifndef ANNOTATE_LITE_PROTOTYPES_ONLY
 
 int n_bad_things = 0;
 
@@ -69,5 +86,7 @@ void report()
 {
     std::cout << n_bad_things << " bad thing(s) happened\n";
 }
+
+#endif	// ANNOTATE_LITE_PROTOTYPES_ONLY
 
 #endif  // ANNOTATE_LITE_H
