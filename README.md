@@ -22,7 +22,7 @@ application of the module throwing the exceptions.
 The name-value parameter pairs allow for extra detail about the error.
 For example, the file name that could not be read.  Each value within the
 name-value pair is stored as a std::string, but template functions allow
-creation of the value from non-std::string types via stringstrem.
+creation of the value from non-std::string types via std::stringstream.
 
 The `description` is intended to be a less-technical, user intelligable string
 that can serve as a default error message higher up in the exception handling
@@ -71,8 +71,8 @@ Name-value pair parameters can be included in the exception by doing:
 void throw_rich_exception_with_params_1()
 {
     throw RichException( "com.codalogic.nexp.show_throw_with_params",
-                         "Throw with params"
-                         ).add( "p1", "first" ).add( "p2", 2 );
+                         RichExceptionParams( "p1", "first" ).add( "p2", 2 ),
+                         "Throw with params" );
 }
 ```
 Or:
@@ -81,8 +81,8 @@ Or:
 void throw_rich_exception_with_params_2()
 {
     throw RichException( "com.codalogic.nexp.show_throw_with_params",
-                         RichExceptionParams( "p1", "first" ).add( "p2", 2 ),
-                         "Throw with params" );
+                         "Throw with params"
+                         ).add( "p1", "first" ).add( "p2", 2 );
 }
 ```
 
@@ -144,7 +144,12 @@ void show_throw_2_with_derived_exceptions()
     ...
 ```
 
-The exception hierarchy can be inspected by iterated through via the
+In fact, it is highly recommended that the changes in code execution sequence
+is influenced only by the type of the derived exception, rather than the 
+`error_uri` or parameters within the `RichException` base (which are intended
+for diagnostics when a fault is found).
+
+The exception hierarchy can be inspected by iterating through them via the
 the `RichException::begin()` and `end()` methods.
 
 ```cpp
@@ -230,7 +235,7 @@ void show_has_and_get_parameter_access()
 }
 ```
 
-As can be seen in the above example, trying to `get()` a non-existant
+As can be seen in the above example, trying to `get()` a non-existent
 parameter returns an empty string.
 
 Warnings
