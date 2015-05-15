@@ -84,7 +84,7 @@ void throw_2_second()
     }
     catch( RichException & e )
     {
-        throw RichException( "com.codalogic.nexp.show_2_second", "Second exception of 2 show", e );
+        throw RichException( "com.codalogic.nexp.show_2_second", "Second exception of 2 show", &e );
     }
 }
 
@@ -125,7 +125,7 @@ void show_params_storage()
     RichException rich_exception_2( "com.codalogic.nexp.show_params_storage.2",
                                     RichExceptionParams( "p2_1", "v2_1" ).add( "p2_2", 2 ).add( "p2_3", 3.0 ),
                                     "First show params exception 2 show",
-                                    rich_exception_1 );
+                                    &rich_exception_1 );
 
     Verify( rich_exception_1.size() == 0, "Has rich_exception_1 contents been passed to rich_exception_2?" );
     VerifyCritical( rich_exception_2.size() == 2, "Is rich_exception_2 exception size correct?" );
@@ -183,36 +183,22 @@ void show_exception_with_params()
 
 struct FileException : public RichException
 {
-    FileException( const std::string & file_name_in )
-        :
-        RichException( "com.codalogic.file.noopen",
-                        RichExceptionParams( "name", file_name_in ),
-                        "Unable to open file" )
-    {}
-    FileException( const std::string & file_name_in, RichException & r_prev )
+    FileException( const std::string & file_name_in, RichException * p_prev = 0 )
         :
         RichException( "com.codalogic.file.noopen",
                         RichExceptionParams( "name", file_name_in ),
                         "Unable to open file",
-                        r_prev )
+                        p_prev )
     {}
 };
 
 struct DatabaseException : public RichException
 {
-    DatabaseException( int row, int column )
-        :
-        RichException( "com.codalogic.database.badcell",
-                        "Unable to access database cell" )
-    {
-        add( "row", row );
-        add( "column", column );
-    }
-    DatabaseException( int row, int column, RichException & r_prev )
+    DatabaseException( int row, int column, RichException * p_prev = 0 )
         :
         RichException( "com.codalogic.database.badcell",
                         "Unable to access database cell",
-                        r_prev )
+                        p_prev )
     {
         add( "row", row );
         add( "column", column );
@@ -232,7 +218,7 @@ void throw_2_second_with_derived_exceptions( int row, int column )
     }
     catch( FileException & e )
     {
-        throw DatabaseException( row, column, e );
+        throw DatabaseException( row, column, &e );
     }
 }
 
@@ -306,16 +292,11 @@ double safe_divide( double i, double j )
 
 struct or_k_is_zero : public RichException
 {
-    or_k_is_zero()
-        :
-        RichException( "com.codalogic.f1.safe_divide.k_is_0",
-                        "Divide by zero error" )
-    {}
-    or_k_is_zero( RichException & r_prev )
+    or_k_is_zero( RichException * p_prev = 0 )
         :
         RichException( "com.codalogic.f1.safe_divide.k_is_0",
                         "Divide by zero error",
-                        r_prev )
+                        p_prev )
     {}
 };
 
@@ -328,7 +309,7 @@ double f1( double i, double j, double k )
     }
     catch( or_k_is_zero & e )
     {
-        throw Texception( e );
+        throw Texception( &e );
     }
 }
 
@@ -345,21 +326,13 @@ struct or_default_f1_k_is_zero : public RichException
         return description;
     }
 
-    or_default_f1_k_is_zero()
+    or_default_f1_k_is_zero( RichException * p_prev = 0 )
         :
-        RichException( default_error_uri(), default_description() )
+        RichException( default_error_uri(), default_description(), p_prev )
     {}
-    or_default_f1_k_is_zero( RichException & r_prev )
+    or_default_f1_k_is_zero( const char * error_uri_in, const char * description_in, RichException * p_prev = 0 )
         :
-        RichException( default_error_uri(), default_description(), r_prev )
-    {}
-    or_default_f1_k_is_zero( const char * error_uri_in, const char * description_in )
-        :
-        RichException( error_uri_in, description_in )
-    {}
-    or_default_f1_k_is_zero( const char * error_uri_in, const char * description_in, RichException & r_prev )
-        :
-        RichException( error_uri_in, description_in, r_prev )
+        RichException( error_uri_in, description_in, p_prev )
     {}
 };
 
@@ -376,13 +349,9 @@ struct or_k1_is_zero : public or_default_f1_k_is_zero
         return my_description;
     }
 
-    or_k1_is_zero()
+    or_k1_is_zero( RichException * p_prev = 0 )
         :
-        or_default_f1_k_is_zero( error_uri(), description() )
-    {}
-    or_k1_is_zero( RichException & r_prev )
-        :
-        or_default_f1_k_is_zero( error_uri(), description(), r_prev )
+        or_default_f1_k_is_zero( error_uri(), description(), p_prev )
     {}
 };
 
@@ -399,13 +368,9 @@ struct or_k2_is_zero : public or_default_f1_k_is_zero
         return my_description;
     }
 
-    or_k2_is_zero()
+    or_k2_is_zero( RichException * p_prev = 0 )
         :
-        or_default_f1_k_is_zero( error_uri(), description() )
-    {}
-    or_k2_is_zero( RichException & r_prev )
-        :
-        or_default_f1_k_is_zero( error_uri(), description(), r_prev )
+        or_default_f1_k_is_zero( error_uri(), description(), p_prev )
     {}
 };
 

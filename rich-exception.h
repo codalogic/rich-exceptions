@@ -216,32 +216,21 @@ public:
 
     RichException(
             const char * const error_uri_in,
-            const char * const description_in )
-    {
-        nodes.push_front( RichExceptionNode( error_uri_in, description_in ) );
-    }
-    RichException(
-            const char * const error_uri_in,
-            const RichExceptionParams & error_params_in,
-            const char * const description_in )
-    {
-        nodes.push_front( RichExceptionNode( error_uri_in, error_params_in, description_in ) );
-    }
-    RichException(
-            const char * const error_uri_in,
             const char * const description_in,
-            RichException & r_prev_rich_exception )
+            RichException * p_prev_rich_exception = 0 )
     {
-        nodes.swap( r_prev_rich_exception.nodes );
+        if( p_prev_rich_exception )
+            nodes.swap( p_prev_rich_exception->nodes );
         nodes.push_front( RichExceptionNode( error_uri_in, description_in ) );
     }
     RichException(
             const char * const error_uri_in,
             const RichExceptionParams & error_params_in,
             const char * const description_in,
-            RichException & r_prev_rich_exception )
+            RichException * p_prev_rich_exception = 0 )
     {
-        nodes.swap( r_prev_rich_exception.nodes );
+        if( p_prev_rich_exception )
+            nodes.swap( p_prev_rich_exception->nodes );
         nodes.push_front( RichExceptionNode( error_uri_in, error_params_in, description_in ) );
     }
     virtual ~RichException() throw() {}

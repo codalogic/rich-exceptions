@@ -31,7 +31,6 @@ if necessary.
 A basic example of a function throwing, and then another re-throwing might look like:
 
 ```cpp
-
 void throw_2_first()
 {
     throw RichException( "com.codalogic.nexp.show_2_first", "First exception of 2 show" );
@@ -45,7 +44,7 @@ void throw_2_second()
     }
     catch( RichException & e )
     {
-        throw RichException( "com.codalogic.nexp.show_2_second", "Second exception of 2 show", e );
+        throw RichException( "com.codalogic.nexp.show_2_second", "Second exception of 2 show", &e );
     }
 }
 
@@ -66,42 +65,49 @@ void show_throw_2()
 }
 ```
 
+Name-value pair parameters can be included in the exception by doing:
+
+```cpp
+void throw_rich_exception_with_params_1()
+{
+    throw RichException( "com.codalogic.nexp.show_throw_with_params",
+                         "Throw with params"
+                         ).add( "p1", "first" ).add( "p2", 2 );
+}
+```
+Or:
+
+```cpp
+void throw_rich_exception_with_params_2()
+{
+    throw RichException( "com.codalogic.nexp.show_throw_with_params",
+                         RichExceptionParams( "p1", "first" ).add( "p2", 2 ),
+                         "Throw with params" );
+}
+```
+
 Most likely you wouldn't throw an instance of `RichException` directly, but derive an
 exception class from it, for example:
 
 ```cpp
 struct FileException : public RichException
 {
-    FileException( const std::string & file_name_in )
-        :
-        RichException( "com.codalogic.file.noopen",
-                        RichExceptionParams( "name", file_name_in ),
-                        "Unable to open file" )
-    {}
-    FileException( const std::string & file_name_in, RichException & r_prev )
+    FileException( const std::string & file_name_in, RichException * p_prev = 0 )
         :
         RichException( "com.codalogic.file.noopen",
                         RichExceptionParams( "name", file_name_in ),
                         "Unable to open file",
-                        r_prev )
+                        p_prev )
     {}
 };
 
 struct DatabaseException : public RichException
 {
-    DatabaseException( int row, int column )
-        :
-        RichException( "com.codalogic.database.badcell",
-                        "Unable to access database cell" )
-    {
-        add( "row", row );
-        add( "column", column );
-    }
-    DatabaseException( int row, int column, RichException & r_prev )
+    DatabaseException( int row, int column, RichException * p_prev = 0 )
         :
         RichException( "com.codalogic.database.badcell",
                         "Unable to access database cell",
-                        r_prev )
+                        p_prev )
     {
         add( "row", row );
         add( "column", column );
@@ -121,10 +127,15 @@ void throw_2_second_with_derived_exceptions( int row, int column )
     }
     catch( FileException & e )
     {
-        throw DatabaseException( row, column, e );
+        throw DatabaseException( row, column, &e );
     }
 }
+```
 
+The exception hierarchy can be inspected by iteratong through using the
+the 
+
+```cpp
 void show_throw_2_with_derived_exceptions()
 {
     try
@@ -174,27 +185,6 @@ void show_throw_2_with_derived_exceptions()
         Verify( i_rich_exception->error_params[0].value == "abc.txt",
                 "Is FileException exception first value correct?" );
     }
-}
-```
-
-As can be seen above, name-value pair parameters can be included in the
-exception by doing:
-
-```cpp
-void throw_rich_exception_with_params()
-{
-    throw RichException( "com.codalogic.nexp.show_throw_with_params",
-                         "Throw with params" ).add( "p1", "first" ).add( "p2", 2 );
-}
-```
-Or:
-
-```cpp
-void throw_rich_exception_with_params()
-{
-    throw RichException( "com.codalogic.nexp.show_throw_with_params",
-                         RichExceptionParams( "p1", "first" ).add( "p2", 2 ),
-                         "Throw with params" );
 }
 ```
 
